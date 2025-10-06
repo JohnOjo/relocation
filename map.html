@@ -114,7 +114,7 @@
                 if (lat && lng) {
                     const marker = L.marker([lat, lng]);
 
-                    marker.bindPopup('<div class="custom-popup"><b>' + job.position + '</b><br/>' + job.company + '<br/>' + job.location + '<br/><a href="' + job.description + '">Apply</a></div>');
+                    marker.bindPopup('<div class="custom-popup"><b>' + job.position + '</b><br/>' + job.company + '<br/>' + job.location + '<br/><a href="' + job.description + '" target="_blank"  rel="noopener noreferrer">Apply</a></div>');
 
                     markers.addLayer(marker);
 
@@ -127,4 +127,5 @@
 </body>
 
 </html>
+
 
