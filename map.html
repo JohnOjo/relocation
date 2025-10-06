@@ -53,15 +53,55 @@
         }).addTo(map);
 
         fetch('assets/data.json')
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(data) {
+            .then(response => response.json())
+            .then(data => {
+                // 1. Create the lookup cache
+                const locationCache = createLocationCache(data); 
+
+                // 2. Fill in any missing coordinates using the cache
+                fillMissingCoordinates(data, locationCache); 
+                
+                // 3. Process the now-updated data
                 processJobsData(data);
             })
             .catch(function(error) {
                 console.error('Error:', error);
             });
+
+        function createLocationCache(data) {
+            const cache = {};
+
+            data.forEach(job => {
+                // Create a unique key using both company and location
+                const key = `${job.company}|${job.location}`;
+
+                // Only store if the coordinates exist
+                if (job.latitude && job.longitude && !cache[key]) {
+                    cache[key] = {
+                        latitude: job.latitude,
+                        longitude: job.longitude
+                    };
+                }
+            });
+
+            return cache;
+        }
+
+        function fillMissingCoordinates(data, cache) {
+            data.forEach(job => {
+                // Check if the current job is missing coordinates
+                if (!job.latitude || !job.longitude) {
+                    const key = `${job.company}|${job.location}`;
+                    
+                    // Look up the coordinates in the cache
+                    if (cache[key]) {
+                        job.latitude = cache[key].latitude;
+                        job.longitude = cache[key].longitude;
+                        console.log(`Filled coordinates for: ${job.position} at ${job.location}`);
+                    }
+                }
+            });
+        }
 
         function processJobsData(data) {
             var markers = L.markerClusterGroup();
